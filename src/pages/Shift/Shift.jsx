@@ -4,12 +4,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createShift, getActiveShift } from '../../services/ShiftService';
 import { useNavigate } from 'react-router-dom';
 import LocalStorageService from '../../services/LocalStorageService';
+import { checkIn } from '../../services/admin_services/ShiftLogService';
 
 function Shift() {
     const navigate = useNavigate();
     const [enable, setEnable] = useState(false);
     const [currentShift, setCurrentShift] = useState([]);
     const [loading, setLoading] = useState(true);
+    const userLogged = LocalStorageService.getItem("userLogged");
+    const employeeId = userLogged?.id;
 
     useEffect(() => {
         const check = checkCurrentShift();
@@ -123,20 +126,47 @@ function Shift() {
     const handleOpenShift = async () => {
         try {
             const response = await createShift();
-            LocalStorageService.setItem("shiftId", response.data.result.shiftId);
             toast.success('Mở ca làm việc thành công!');
-            // checkCurrentShift(); // Refresh shift status
-            navigate("/");
+            // Gọi lại getActiveShift để lấy shiftId mới
+            await checkCurrentShift();
         } catch (error) {
             toast.error('Có lỗi xảy ra khi mở ca!');
             console.error(error);
         }
     };
 
-    const handleStartWorking = () => {
-        toast.success('Bắt đầu làm việc!');
-        navigate("/");
+
+    const handleStartWorking = async () => {
+        try {
+            const userLogged = LocalStorageService.getItem("userLogged");
+            const employeeId = userLogged?.id;
+            const shiftId = LocalStorageService.getItem("shiftId");
+
+            console.log('employeeId:', employeeId);
+            console.log('shiftId:', shiftId);
+
+            if (!employeeId || !shiftId) {
+                toast.error("Thiếu thông tin nhân viên hoặc ca làm.");
+                return;
+            }
+
+            const res = await checkIn(employeeId, shiftId);
+            console.log("Response from checkIn:", res);
+
+            if (res.status === 200) {
+                toast.success("Check-in thành công!");
+
+                navigate("/");
+            } else {
+                toast.error("Không thể check-in!");
+            }
+        } catch (error) {
+            console.error("Lỗi check-in:", error);
+            toast.error("Lỗi khi check-in!");
+        }
     };
+
+
 
     if (loading) {
         return (

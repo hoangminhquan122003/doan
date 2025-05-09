@@ -87,12 +87,15 @@ export const MangeTable = () => {
                 ...currentTable,
                 status: 'AVAILABLE'
             };
+            console.log('khong chuyen đc')
 
             const response = await updateTable(tableId, updatedTable);
+            console.log('lolololo')
 
             if (response.data.code === 200) {
                 fetchTables();
             }
+            console.log('lolo1lolo1')
         } catch (error) {
             console.error("Lỗi khi hủy bảo trì:", error);
         }

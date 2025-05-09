@@ -13,6 +13,7 @@ import LocalStorageService from "../../services/LocalStorageService";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable'; // Nếu bạn sử dụng autotable
 import { notification } from "antd";
+import { checkOut } from '../../services/admin_services/ShiftLogService';
 
 
 
@@ -135,10 +136,29 @@ const ShiftMonitor = () => {
     };
 
     const fetchShift = async () => {
-        await closeShift(shiftId);
-        LocalStorageService.clear(); // hoặc clearToken(), tùy vào bạn lưu gì
-        navigate("/login");
-    }
+        try {
+
+
+            const userLogged = LocalStorageService.getItem("userLogged");
+            const employeeId = userLogged?.id;
+
+            if (!employeeId || !shiftId) {
+                notification.error({ message: "Thiếu thông tin nhân viên hoặc ca làm để check-out", duration: 2 });
+                return;
+            }
+
+            await checkOut(employeeId, shiftId);
+            await closeShift(shiftId);
+            notification.success({ message: "Đã chốt ca và ghi nhận nhân viên", duration: 2 });
+            LocalStorageService.clear();
+            navigate("/login");
+
+        } catch (err) {
+            console.error("Lỗi khi chốt ca hoặc check-out shift log:", err);
+            notification.error({ message: "Có lỗi xảy ra khi chốt ca", duration: 2 });
+        }
+    };
+
 
     return (
         <Layout>
