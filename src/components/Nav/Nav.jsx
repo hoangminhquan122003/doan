@@ -10,7 +10,7 @@ import { Button } from 'antd';
 import { logout } from "../../services/AuthService";
 import LocalStorageService from "../../services/LocalStorageService";
 import Swal from 'sweetalert2';
-
+import { Modal } from 'antd';
 
 
 
@@ -18,6 +18,15 @@ function Nav() {
     //get real time
     const [currentTime, setCurrentTime] = useState(new Date());
     const [info, setInfo] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -87,7 +96,7 @@ function Nav() {
                     <p style={{ height: '20px' }} className="flex justify-center">{currentClock}</p>
                 </div>
 
-                <div className="flex ms-auto">
+                <div className="flex ms-auto" onClick={showModal} style={{ cursor: 'pointer' }}>
                     <div>
                         <p style={{ height: '20px', fontSize: '16px', fontWeight: 'bolder' }}>{info.fullName}</p>
                         <p style={{ height: '20px' }} className="flex justify-end">{info.role}</p>
@@ -95,11 +104,15 @@ function Nav() {
                     <div className="flex items-center">
                         <img
                             src={avatar}
-                            alt="Logo"
-                            style={{ height: '40px', marginRight: '16px', marginLeft: '10px', borderRadius: '50%', }} // Tùy chỉnh kích thước logo
+                            alt="Avatar"
+                            style={{ height: '40px', marginRight: '16px', marginLeft: '10px', borderRadius: '50%' }}
                         />
                     </div>
-                    <div className="flex items-center">
+
+
+
+
+                    {/* <div className="flex items-center">
                         <Button
                             style={{ marginRight: '15px', backgroundColor: '#F96E2A' }}
                             type="primary"
@@ -107,9 +120,43 @@ function Nav() {
                         >
                             Đăng xuất
                         </Button>
-                    </div>
+                    </div> */}
 
                 </div>
+                <Modal
+                    title={<h2 style={{ textAlign: 'center', fontWeight: 'bold' }}>Thông tin cá nhân</h2>}
+                    open={isModalVisible}
+                    onCancel={handleCancel}
+                    footer={null}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <img
+                            src={avatar}
+                            alt="Avatar"
+                            style={{
+                                width: '100px',
+                                height: '100px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                marginBottom: '20px',
+                                border: '2px solid #1890ff',
+                            }}
+                        />
+                        <div style={{ width: '100%' }}>
+                            <p style={{ fontSize: '16px', marginBottom: '10px' }}>
+                                <strong>👤 ID:</strong> {info.id}
+                            </p>
+                            <p style={{ fontSize: '16px', marginBottom: '10px' }}>
+                                <strong>👤 Họ tên:</strong> {info.fullName}
+                            </p>
+                            <p style={{ fontSize: '16px', marginBottom: '10px' }}>
+                                <strong>💼 Chức vụ:</strong> {info.role}
+                            </p>
+                        </div>
+
+                    </div>
+                </Modal>
+
 
             </Menu>
         </Header>
