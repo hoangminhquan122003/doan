@@ -1,0 +1,28 @@
+# Server port
+server:
+  port: ${PORT}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: OrderManagementSystem_backend
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  private-key: ${SIGNER_KEY}
+  refresh-duration: 60 #second
+  refreshable-duration: 3
+gemini:
+  api:
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    key: AIzaSyDG0USJyIv-FmXgyRbUU_cH8QFaWg25494
+
+#  DATABASE_PASSWORD=123456;DATABASE_URL=jdbc:mysql://localhost:3306/order_management_system;DATABASE_USERNAME=root;PORT=8080;SIGNER_KEY="Re3QAHfhwRQNtfD4EKANXhQ04rlnt0BJWoibO8z71BgMoecOwptbU3LOaVicfnQk"
