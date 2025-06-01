@@ -26,7 +26,7 @@ export const Nav = () => {
                 <p className='text-xs font-light text-right'>ROLE: {userLogged.role}</p>
             </div>
             <Avatar
-                src="https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/474082nAQ/avatar-duong-tang-bua_044338241.jpg"
+                src="https://scontent.fhan14-2.fna.fbcdn.net/v/t39.30808-1/395397729_1161909258547130_1266242785814037444_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=108&ccb=1-7&_nc_sid=e99d92&_nc_eui2=AeGpIkRMQVVvnmwH2ofpr7TkEKVcz64R3E8QpVzPrhHcT1TKP5-1J8Hf70ubU908-QdxTxW8eZD6YxaqZiZRL_Me&_nc_ohc=0gI3IscPKEMQ7kNvwHaLM3O&_nc_oc=Adklmnm7sgxJl3kNm0msmED50AP7ojVxZIP8FhH3qp4Zxmu36yNUKCpJy74cwScoDHI&_nc_zt=24&_nc_ht=scontent.fhan14-2.fna&_nc_gid=OLuIlwZi5aybtJa-pNJJ3w&oh=00_AfIipRxtpzLoztyPG9kpGfJmqFmgI165iyVsD1psG1ZXgA&oe=68420E37"
                 size={50}
             />
 

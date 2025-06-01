@@ -24,6 +24,11 @@ export const ManageShift = () => {
             const shiftsResponse = await getAllShift();
             if (shiftsResponse.data.code === 200) {
                 dataResponse = shiftsResponse.data.result;
+                dataResponse.sort((a, b) => {
+                    const datetimeA = new Date(`${a.date}T${a.startTime}`);
+                    const datetimeB = new Date(`${b.date}T${b.startTime}`);
+                    return datetimeB - datetimeA;
+                });
             }
 
             const shiftActiveResponse = await getActiveShift();
@@ -107,7 +112,7 @@ export const ManageShift = () => {
                         <Button variant='filled' >Xem chi tiết ca</Button>
                     </Link>
 
-                    <Popconfirm
+                    {/* <Popconfirm
                         placement='topLeft'
                         title="Bạn có muốn đóng ca này không?"
                         onConfirm={() => handleCloseShift(shiftId)} // Thực hiện hành động khi xác nhận
@@ -122,7 +127,7 @@ export const ManageShift = () => {
                         >
                             Đóng ca
                         </Button>
-                    </Popconfirm>
+                    </Popconfirm> */}
                 </Space>
             ),
         },

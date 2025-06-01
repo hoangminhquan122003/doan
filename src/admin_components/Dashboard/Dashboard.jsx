@@ -42,7 +42,7 @@ export const Dashboard = () => {
             const res = await getAllShift();
             if (res.data.code === 200) {
                 const sorted = res.data.result.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-                setShifts(sorted.slice(0, 15));
+                setShifts(sorted);
             }
         } catch (err) { console.error(err); }
     };
