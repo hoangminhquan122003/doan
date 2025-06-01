@@ -63,7 +63,7 @@ export const ModalActionEmployee = ({ setIsModalOpen, employeeDetail, fetchEmplo
             if (response.data.code === 200) {
                 notification.success({
                     message: "Cập nhật thành công",
-                    description: "Cập nhật thành công"
+                    //description: "Cập nhật thành công"
                 });
             }
             fetchEmployees();

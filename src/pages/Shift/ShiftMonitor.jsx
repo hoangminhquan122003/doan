@@ -14,7 +14,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable'; // Nếu bạn sử dụng autotable
 import { notification } from "antd";
 import { checkOut } from '../../services/admin_services/ShiftLogService';
-
+import Swal from 'sweetalert2';
 
 
 const ShiftMonitor = () => {
@@ -157,6 +157,38 @@ const ShiftMonitor = () => {
             console.error("Lỗi khi chốt ca hoặc check-out shift log:", err);
             notification.error({ message: "Có lỗi xảy ra khi chốt ca", duration: 2 });
         }
+    }; const handleConfirmShift = () => {
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc chắn muốn chốt ca?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Chốt ca',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetchShift();
+            }
+        });
+    };
+
+    const handleConfirmShiftAndPrint = () => {
+        Swal.fire({
+            title: 'Xác nhận',
+            text: 'Bạn có chắc chắn muốn chốt ca và in đơn?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Chốt & In',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handlePayment();
+            }
+        });
     };
 
 
@@ -195,16 +227,19 @@ const ShiftMonitor = () => {
                         <div className="button-container flex items-center justify-center space-x-4">
                             <button
                                 className="btn bg-blue-500 text-white font-bold py-2 px-4 rounded shadow hover:bg-blue-600 hover:shadow-lg transition duration-200"
-                                onClick={fetchShift}
+                                onClick={handleConfirmShift}
                             >
                                 Chốt ca
                             </button>
-                            <button style={{ backgroundColor: '#F96E2A' }}
+
+                            <button
+                                style={{ backgroundColor: '#F96E2A' }}
                                 className="btn text-white font-bold py-2 px-4 rounded shadow hover:bg-green-600 hover:shadow-lg transition duration-200"
-                                onClick={handlePayment}
+                                onClick={handleConfirmShiftAndPrint}
                             >
                                 Chốt ca và in đơn
                             </button>
+
                         </div>
                     </Content>
                 </Layout>

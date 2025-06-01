@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Spin, Row, Col, DatePicker, message } from 'antd';
+import { Table, Typography, Spin, Row, Col, DatePicker, message, InputNumber } from 'antd';
 import { getMonthlyWorkLogs } from '../../../services/admin_services/ShiftLogService';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { Button } from 'antd';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -17,8 +20,48 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
     const [loading, setLoading] = useState(false);
     const [totalHours, setTotalHours] = useState(0);
     const [totalSessions, setTotalSessions] = useState(0);
+    const [hourlyRate, setHourlyRate] = useState(0);
+    const [totalWage, setTotalWage] = useState(0);
 
-    // Hàm fetch dữ liệu theo khoảng thời gian
+    const handleExportExcel = () => {
+        const dataToExport = formattedLogs.map((log, index) => ({
+            STT: index + 1,
+            Ngày: log.workDate,
+            'Giờ bắt đầu': log.startTime,
+            'Giờ kết thúc': log.endTime,
+            'Tổng giờ': log.totalHours,
+        }));
+
+        // Tạo worksheet từ dữ liệu
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+        // Tính dòng tiếp theo để ghi tổng số giờ
+        const totalRowIndex = dataToExport.length + 2;
+        const wageRowIndex = totalRowIndex + 1;
+
+        // Ghi tổng giờ làm việc
+        XLSX.utils.sheet_add_aoa(worksheet, [
+            [`Tổng thời gian làm việc: ${totalHours} giờ`]
+        ], { origin: `A${totalRowIndex}` });
+
+        // Ghi tổng lương nếu có
+        if (hourlyRate > 0) {
+            XLSX.utils.sheet_add_aoa(worksheet, [
+                [`Tổng lương: ${new Intl.NumberFormat('vi-VN').format(totalWage)} ₫`]
+            ], { origin: `A${wageRowIndex}` });
+        }
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Lịch sử làm việc');
+
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const fileName = `worklog_${employeeDetail?.fullName?.replace(/\s+/g, '_')}_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
+        const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        saveAs(data, fileName);
+    };
+
+
+
     const fetchWorkLogsInRange = async (fromDate, toDate) => {
         setLoading(true);
         let logs = [];
@@ -28,7 +71,6 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
 
         try {
             const res = await getMonthlyWorkLogs(employeeDetail.id, start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
-            console.log('Raw API res:', res);
 
             if (!res || !res.data) {
                 message.error('Không có dữ liệu!');
@@ -36,25 +78,15 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
             }
 
             logs = res.data;
-            console.log('Parsed logs:', logs.map(log => log.date));
 
-            // Kiểm tra giá trị ngày của từng log và so sánh
             const filteredLogs = logs.filter(log => {
-                const logDate = dayjs(log.date).startOf('day');  // Chuyển logDate về đúng múi giờ và thời gian bắt đầu ngày
-                console.log(`Log Date: ${logDate.format('YYYY-MM-DD')}`);  // Kiểm tra giá trị log date của từng bản ghi
-
-                console.log('Start Date:', start.format()); // Kiểm tra start date
-                console.log('End Date:', end.format());  // Kiểm tra end date
-
-                // Điều kiện lọc: Kiểm tra logDate có trong khoảng từ start đến end hay không
+                const logDate = dayjs(log.date).startOf('day');
                 return logDate.isSameOrAfter(start) && logDate.isSameOrBefore(end);
             });
 
-            console.log('Filtered logs:', filteredLogs);
-
             if (filteredLogs.length === 0) {
                 message.warning('Không có dữ liệu trong khoảng thời gian này!');
-                setWorkLogs([]); // Xóa dữ liệu cũ
+                setWorkLogs([]);
                 setTotalHours(0);
                 setTotalSessions(0);
                 return;
@@ -63,10 +95,7 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
                 let sessionCount = 0;
 
                 filteredLogs.forEach(log => {
-                    if (!Array.isArray(log.sessions)) {
-                        console.warn('Invalid sessions format:', log);
-                        return;
-                    }
+                    if (!Array.isArray(log.sessions)) return;
                     log.sessions.forEach(session => {
                         if (session.hours) {
                             totalH += session.hours;
@@ -87,17 +116,18 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
         }
     };
 
-
-
-    // Gọi khi mới mở modal hoặc khi chọn ngày
     useEffect(() => {
         if (employeeDetail?.id) {
             fetchWorkLogsInRange(startDate, endDate);
         }
     }, [employeeDetail, startDate, endDate]);
 
+    // Tính lại tổng tiền khi thay đổi giờ hoặc giá
+    useEffect(() => {
+        const wage = parseFloat(totalHours) * parseFloat(hourlyRate);
+        setTotalWage(wage.toFixed(2));
+    }, [totalHours, hourlyRate]);
 
-    // Định dạng lại logs để hiển thị
     const formattedLogs = workLogs.flatMap(log =>
         log.sessions.map(session => ({
             workDate: log.date,
@@ -137,17 +167,45 @@ export const ModalWorkInfoEmployee = ({ employeeDetail }) => {
                 </Col>
             </Row>
 
-
             {loading ? (
                 <Spin />
             ) : (
                 <>
                     <Row gutter={[16, 8]}>
                         <Col>
-                            <Text strong>Tổng thời gian làm việc:</Text> <Text>{totalHours} giờ</Text>
+                            <Text strong>Tổng thời gian làm việc:</Text>{' '}
+                            <Text>{totalHours} giờ</Text>
                         </Col>
                         <Col>
-                            <Text strong>Số lần làm việc:</Text> <Text>{totalSessions}</Text>
+                            <Text strong>Số lần làm việc:</Text>{' '}
+                            <Text>{totalSessions}</Text>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={[16, 8]} style={{ marginTop: 12 }}>
+                        <Col>
+                            <Text strong>Giá tiền mỗi giờ:</Text>{' '}
+                            <InputNumber
+                                value={hourlyRate}
+                                onChange={(value) => setHourlyRate(value || 0)}
+                                min={0}
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(value) => value.replace(/,/g, '')}
+                                addonAfter="₫"
+                            />
+                        </Col>
+                        <Col>
+                            <Text strong>Tổng tiền lương:</Text>{' '}
+                            <Text type="success">
+                                {new Intl.NumberFormat('vi-VN').format(totalWage)} ₫
+                            </Text>
+                        </Col>
+                    </Row>
+                    <Row justify="end" style={{ marginTop: 16 }}>
+                        <Col>
+                            <Button type="primary" onClick={handleExportExcel}>
+                                Xuất Excel
+                            </Button>
                         </Col>
                     </Row>
 

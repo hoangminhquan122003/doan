@@ -42,14 +42,14 @@ export const ModalCreateDiscount = ({ handleCancel, fetchDiscount }) => {
                 autoComplete="off"
             >
                 <Form.Item
-                    label="Discount Code"
+                    label="Mã giảm giá"
                     name="discountCode"
                     rules={[{ required: true, message: "Please enter discount code!" }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
-                    label="Discount Type"
+                    label="Loại giảm giá"
                     name="discountType"
                     initialValue="FIXED"
                     rules={[{ required: true, message: "Please select discount type!" }]}
@@ -60,7 +60,7 @@ export const ModalCreateDiscount = ({ handleCancel, fetchDiscount }) => {
                     </Select>
                 </Form.Item>
                 <Form.Item
-                    label="Discount Value"
+                    label="Giá trị giảm giá"
                     name="discountValue"
                     rules={[{ required: true, message: "Please enter discount value!" }]}
                 >

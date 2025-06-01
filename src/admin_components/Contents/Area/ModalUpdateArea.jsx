@@ -25,7 +25,7 @@ export const ModalUpdateArea = ({ handleUpdateCancel, fetchAllArea, areaUpdate }
             if (response.data.code === 200) {
                 notification.success({
                     message: "Cập nhật khu vực thành công",
-                    description: "Cập nhật khu vực thành công"
+                    //description: "Cập nhật khu vực thành công"
                 });
                 form.resetFields();
                 handleUpdateCancel();

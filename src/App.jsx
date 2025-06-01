@@ -53,7 +53,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<ErrorPage />} />
-        <Route path="/areas/:areaId" element={<AreaDetail />} />
+        {/* <Route path="/areas/:areaId" element={<AreaDetail />} /> */}
 
         {/* Admin */}
         <Route path="/admin" element={

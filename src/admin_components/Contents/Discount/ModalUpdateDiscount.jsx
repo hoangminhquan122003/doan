@@ -49,14 +49,14 @@ export const ModalupdateDiscount = ({ handleCancel, fetchDiscount, discountUpdat
                 autoComplete="off"
             >
                 <Form.Item
-                    label="Discount Code"
+                    label="Mã giảm giá"
                     name="discountCode"
                     rules={[{ required: true, message: "Please enter discount code!" }]}
                 >
                     <Input disabled />
                 </Form.Item>
                 <Form.Item
-                    label="Discount Type"
+                    label="Loại giảm giá"
                     name="discountType"
                     initialValue="FIXED"
                     rules={[{ required: true, message: "Please select discount type!" }]}
@@ -67,13 +67,13 @@ export const ModalupdateDiscount = ({ handleCancel, fetchDiscount, discountUpdat
                     </Select>
                 </Form.Item>
                 <Form.Item
-                    label="Discount Value"
+                    label="Giá trị giảm giá"
                     name="discountValue"
                     rules={[{ required: true, message: "Please enter discount value!" }]}
                 >
                     <Input type="number" />
                 </Form.Item>
-                <Form.Item name="status" label="Status" initialValue={true}>
+                <Form.Item name="status" label="Trạng thái" initialValue={true}>
                     <Switch />
                 </Form.Item>
                 <div className='flex gap-2 justify-end'>

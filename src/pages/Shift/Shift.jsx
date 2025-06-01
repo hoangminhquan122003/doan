@@ -5,7 +5,7 @@ import { createShift, getActiveShift } from '../../services/ShiftService';
 import { useNavigate } from 'react-router-dom';
 import LocalStorageService from '../../services/LocalStorageService';
 import { checkIn } from '../../services/admin_services/ShiftLogService';
-
+import Swal from 'sweetalert2';
 function Shift() {
     const navigate = useNavigate();
     const [enable, setEnable] = useState(false);
@@ -81,7 +81,7 @@ function Shift() {
                             </div>
 
                             {/* Open Shift Button */}
-                            <div className="mt-8">
+                            <div className="mt-8 flex flex-col space-y-4">
                                 <button
                                     onClick={handleOpenShift}
                                     className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center"
@@ -90,6 +90,12 @@ function Shift() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
                                     Mở Ca
+                                </button>
+                                <button
+                                    onClick={handleBackToLogin}
+                                    className="w-full bg-red-100 text-red-700 px-6 py-3 rounded-lg font-semibold hover:bg-red-200 transition-colors duration-300"
+                                >
+                                    Quay lại trang đăng nhập
                                 </button>
                             </div>
                         </div>
@@ -134,6 +140,31 @@ function Shift() {
             console.error(error);
         }
     };
+    const handleBackToLogin = async () => {
+        const result = await Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: "Bạn sẽ quay lại trang đăng nhập.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Có, quay lại',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (result.isConfirmed) {
+            // ✅ Xóa thông tin đăng nhập
+            LocalStorageService.removeItem("userLogged");
+            // LocalStorageService.removeItem("shiftId");
+            LocalStorageService.removeItem("token");
+            // ✅ Điều hướng về trang login
+            navigate('/login');
+
+            // (tuỳ ứng dụng của bạn) có thể thêm reload để đảm bảo state được reset
+            // window.location.reload(); // Nếu cần reset app state
+        }
+    };
+
 
 
     const handleStartWorking = async () => {

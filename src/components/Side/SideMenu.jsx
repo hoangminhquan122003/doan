@@ -7,6 +7,7 @@ import '../../assets/Side/Side.css';
 import { getAllCategories } from '../../services/CategoryService';
 import { sendMessage } from '../../services/ChatService';  // Import ChatService
 import { message } from 'antd';
+import { Link } from 'react-router-dom';
 
 
 const { Sider } = Layout;
@@ -27,9 +28,9 @@ function Side({ onCategoryClick }) {
     {
       key: 'back',
       label: (
-        <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: 'white' }}>
+        <Link to="/" style={{ fontWeight: 'bold', color: 'white' }}>
           Quay lại
-        </button>
+        </Link>
       ),
       icon: < LeftOutlined style={{ color: 'white', fontWeight: 'bold' }} />,
       className: 'menu-item',
